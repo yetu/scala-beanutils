@@ -1,14 +1,17 @@
+import bintray.Keys._
 import sbt._
-import Keys._
+import sbt.Keys._
 
 object BuildSettings {
   val buildSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.yetu",
-    version := "0.1.0-SNAPSHOT",
+    version := "0.1.0",
     scalaVersion := "2.10.5",
     crossScalaVersions := Seq("2.10.5", "2.11.6"),
     scalacOptions += "",
-    licenses := ("Apache2", new java.net.URL("http://www.apache.org/licenses/LICENSE-2.0.txt")) :: Nil
+    licenses := ("Apache-2.0", new java.net.URL("http://www.apache.org/licenses/LICENSE-2.0.txt")) :: Nil,
+    publishMavenStyle := false,
+    publishArtifact in Test := false
   )
 }
 
@@ -18,7 +21,7 @@ object ScalaMacroDebugBuild extends Build {
   val macroParadise = "org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full
 
   lazy val root: Project = Project(
-    "root",
+    "scala-beanutils",
     file("."),
     settings = buildSettings
   ) aggregate (macros, examples)

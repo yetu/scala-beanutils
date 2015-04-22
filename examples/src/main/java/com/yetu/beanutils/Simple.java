@@ -1,5 +1,8 @@
 package com.yetu.beanutils;
 
+/**
+ * Test bean for the @beanCompanion macro
+ */
 public class Simple {
     private final String name;
     private final int value;

@@ -1,3 +1,5 @@
+import bintray.Keys._
+
 val gitVersionIdentifier = settingKey[String]("current git tag name or commit SHA")
 
 gitVersionIdentifier in ThisBuild := {
@@ -6,3 +8,7 @@ gitVersionIdentifier in ThisBuild := {
 }
 
 bintraySettings
+
+vcsUrl in bintray := Some("git@github.com:yetu/scala-beanutils.git")
+
+bintrayOrganization in bintray := Some("yetu")

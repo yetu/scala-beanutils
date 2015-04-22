@@ -77,6 +77,10 @@ object $objectName {
 
 }
 
+/**
+ * Macro annotation to generate a type constructor and extractor for a JavaBean in an object
+ * @tparam T The JavaBean class to generate the constructor/extractor from
+ */
 class beanCompanion[ T ] extends StaticAnnotation {
   def macroTransform(annottees: Any*) = macro beanCompanionMacro.impl
 }
