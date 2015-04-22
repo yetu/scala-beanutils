@@ -1,6 +1,6 @@
-# Bean macros
+# Scala JavaBean Utilities
 
-This library will provide useful macros to work with JavaBeans from Scala.
+This library will provide useful macros and classes to work with JavaBeans from Scala.
 
 There is currently a single macro here: the annotation `@beanMacro`, which adds a type constructor and extractor for
 a given JavaBean to the Scala object to which it is applied.
