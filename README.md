@@ -5,16 +5,25 @@ This library will provide useful macros and classes to work with JavaBeans from 
 There is currently a single macro here: the annotation `@beanMacro`, which adds a type constructor and extractor for
 a given JavaBean to the Scala object to which it is applied.
 
-## Usage
+## Installation
 
-This package currently depends on [Macro Paradise](http://docs.scala-lang.org/overviews/macros/paradise.html). Therefore
-you have to add the Macro Paradise compiler plugin to your build:
+The scala-binutils package is published to [Bintray](https://bintray.com/yetu/maven/scala-beanutils). To be able to use
+it, you need to add the repository to your build:
 
 ```scala
-addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
+resolvers += Resolver.url("yetu-bintray-repo", "https://bintray.com/yetu/maven")
 ```
 
-(TODO: Add SBT instructions once we've published)
+After that, add the following dependency, as well as the
+[Macro Paradise](http://docs.scala-lang.org/overviews/macros/paradise.html) compiler plugin (which is needed to enable
+macro annotations):
+
+```scala
+libraryDependencies += "com.yetu" %% "scala-beanutils" % "0.1.0"
+libraryDependencies += compilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
+```
+
+## Usage
 
 Say you have the following JavaBean:
 

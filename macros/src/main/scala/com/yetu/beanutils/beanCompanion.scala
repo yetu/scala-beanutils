@@ -15,7 +15,7 @@ object beanCompanionMacro {
         // An object definition automatically creates its own constructor, so get a list of all the non-constructor
         // declarations inside the object
         val nonConstructors = body.collect {
-          case method @ DefDef(_, name, _, _, _, _) if name != nme.CONSTRUCTOR => method
+          case method @ DefDef(_, name, _, _, _, _) if name != nme.CONSTRUCTOR ⇒ method
         }
 
         // Some pattern matching magic to get at the Type instance of the target class
