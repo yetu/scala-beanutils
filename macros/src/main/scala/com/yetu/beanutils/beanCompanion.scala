@@ -24,7 +24,7 @@ object beanCompanionMacro {
           case Apply(Select(New(AppliedTypeTree(Ident(_), List(typ))), nme.CONSTRUCTOR), List()) ⇒ typ
         }
         // Of course 7 is not an instance of the Target class... but all we want is to extract the Type of the class
-        val targetType: Type = c.typeCheck(q"(7.asInstanceOf[$targetClass])").tpe
+        val targetType: Type = c.typeCheck(q"(42.asInstanceOf[$targetClass])").tpe
 
         // Get the constructor with the longest parameter list. This will be used for apply and unapply
         val constructor = targetType.declarations
@@ -40,10 +40,7 @@ object beanCompanionMacro {
 
         // We need all the accessors to generate the correct calls in unapply due to Java using getX for property x
         // (i.e., upper/lowercase and adding 'get'). We could use just String manipulation but this is safer
-        val accessors = targetType.declarations.filter { decl ⇒
-          val name = decl.name.decoded
-          name.startsWith("get") || name.startsWith("is") || name.startsWith("has")
-        }.map(_.asMethod)
+        val accessors = accessorsFor(c)(targetType)
 
         // And now generate the unapply method
         val unapplyTypes = params map { p ⇒ q"${p.typeSignature}" }
@@ -67,6 +64,14 @@ object $objectName {
     }
   }
 
+  def accessorsFor(c: Context)(targetType: c.universe.Type): Iterable[c.universe.MethodSymbol] = {
+    targetType.baseClasses flatMap { typeSym =>
+      typeSym.asType.toType.declarations.filter { decl ⇒
+        val name = decl.name.decoded
+        name.startsWith("get") || name.startsWith("is") || name.startsWith("has")
+      }.map(_.asMethod)
+    }
+  }
 }
 
 /**

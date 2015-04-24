@@ -1,4 +1,4 @@
-package com.yetu.beanutils;
+package com.yetu.beanutils.beans;
 
 /**
  * Test bean for the @beanCompanion macro
