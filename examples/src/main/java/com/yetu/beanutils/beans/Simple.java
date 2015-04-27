@@ -1,7 +1,7 @@
 package com.yetu.beanutils.beans;
 
 /**
- * Test bean for the @beanCompanion macro
+ * Test bean for the @beanCompanion macro. Simple JavaBean with additional accessor methods.
  */
 public class Simple {
     private final String name;
@@ -21,19 +21,17 @@ public class Simple {
         this.value = value;
     }
 
-    public int getValue() {
-        return value;
-    }
+    public String getName() { return name; }
+
+    public int getValue() { return value; }
 
     public boolean isEmpty() { return getFull().isEmpty(); }
 
     public boolean hasFoo() { return getFull().toLowerCase().contains("foo"); }
 
-    public int getLength() { return getFull().length(); }
-
-    public String getName() { return name; }
-
     public String getFull() { return name + ": " + value;}
+
+    public int getLength() { return getFull().length(); }
 
     public String toString() { return getFull(); }
 }

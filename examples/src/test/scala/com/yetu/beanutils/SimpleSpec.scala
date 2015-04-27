@@ -16,12 +16,12 @@ class SimpleSpec extends WordSpecLike with MustMatchers {
 
     "unapply method" must {
       "extract the values corresponding to the longest constructor" in {
-        val obj = new b.Simple("foo", 1)
+        val obj = new b.Simple("foo", 42)
         val result = obj match {
-          case c.Simple(name, value) => (name, value)
+          case c.Simple(name, value, empty, hasFoo, length, full) => (name, value, empty, hasFoo, full, length)
         }
 
-        result === ("foo", 1)
+        result === ("foo", 42, false, true, "foo: 42", 7)
       }
     }
 

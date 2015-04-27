@@ -76,3 +76,7 @@ parameters.
 
 * If the JavaBean has multiple constructors, `@beanCompanion` will pick the one with the most parameters.
 
+* We assume that the constructor parameters have the same names as the getters. If that is not the case the generated
+`unapply` method will not match the generated `apply` method. Also, if the Java file does not have debug symbols (i.e.,
+the names of the constructor arguments are not in the .class file), it takes all the accessor methods in the Java file
+and uses them for `unapply`. Have a look at Simple.java and SimpleSpec.scala to see what this means.

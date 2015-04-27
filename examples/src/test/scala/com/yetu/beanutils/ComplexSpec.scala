@@ -20,7 +20,10 @@ class ComplexSpec extends WordSpecLike with MustMatchers {
       "extract the full tree" in {
         val obj: b.Complex = c.Complex(c.Simple("foo", 1), c.Simple("bar", 2))
         val result = obj match {
-          case c.Complex(c.Simple(name1, value1), c.Simple(name2, value2)) => ((name1, value1), (name2, value2))
+          case c.Complex(
+            c.Simple(name1, value1, empty1, hasFoo1, length1, full1),
+            c.Simple(name2, value2, empty2, hasFoo2, length2, full2)
+            ) ⇒ ((name1, value1), (name2, value2))
         }
 
         result === (("foo", 1), ("bar", 2))
