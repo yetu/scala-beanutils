@@ -5,6 +5,8 @@ import scala.language.experimental.macros
 import scala.reflect.macros._
 
 object beanCompanionMacro {
+  val accessorRegex = "^((get)|(is)|(has))[A-Z]".r
+
   def impl(c: Context)(annottees: c.Expr[ Any ]*): c.Expr[ Any ] = {
     import c.universe._
 
@@ -14,8 +16,8 @@ object beanCompanionMacro {
        * @return
        */
       def isAccessor(sym: Symbol): Boolean = {
-        val name = sym.name.decoded
-        name.startsWith("get") || name.startsWith("is") || name.startsWith("has")
+        val name: String = sym.name.decoded
+        accessorRegex.findPrefixOf(name).isDefined
       }
 
       /**
@@ -35,15 +37,15 @@ object beanCompanionMacro {
        * Get the Type instance corresponding to the target Type
        * @return
        */
-      def getTargetType: c.universe.Type = {
+      def getTargetTypeAndParameters: (Type, List[ Tree ]) = {
         // Some pattern matching magic to get at the Type instance of the target class
         // Reference: http://imranrashid.com/posts/scala-reflection/, section "Parametrizing Annotations"
-        val targetClass = c.prefix.tree match {
-          case Apply(Select(New(AppliedTypeTree(Ident(_), List(typ))), nme.CONSTRUCTOR), List()) ⇒ typ
+        val (targetClass, params) = c.prefix.tree match {
+          case Apply(Select(New(AppliedTypeTree(Ident(_), List(typ))), nme.CONSTRUCTOR), p) ⇒ (typ, p)
         }
 
         // Of course 7 is not an instance of the Target class... but all we want is to extract the Type of the class
-        c.typeCheck(q"(42.asInstanceOf[$targetClass])").tpe
+        (c.typeCheck(q"(42.asInstanceOf[$targetClass])").tpe, params)
       }
 
       /**
@@ -126,7 +128,14 @@ object beanCompanionMacro {
         val ModuleDef(_, objectName, template) = objectDef
         val Template(_, _, body) = template
 
-        val targetType: Type = getTargetType
+        val (targetType, params) = getTargetTypeAndParameters
+
+        val debug = params.headOption match {
+          case Some(AssignOrNamedArg(Ident(name), Literal(Constant(true)))) if name.decoded == "debug" ⇒ true
+          case _ ⇒ false
+        }
+        c.macroApplication.symbol.annotations.find(_.tpe <:< typeOf[ beanCompanion[ _ ] ])
+
         val constructorParams: List[ Symbol ] = getConstructorParams(targetType)
 
         val apply = generateApplyMethod(targetType, constructorParams)
@@ -139,7 +148,8 @@ object beanCompanionMacro {
 object $objectName {
   ..$objectBody
 }"""
-        c.info(c.enclosingPosition, show(ret), true)
+        if (debug) c.info(c.enclosingPosition, show(ret), debug)
+
         c.Expr[ Any ](ret)
       }
 
@@ -153,7 +163,8 @@ object $objectName {
 /**
  * Macro annotation to generate a type constructor and extractor for a JavaBean in an object
  * @tparam T The JavaBean class to generate the constructor/extractor from
+ * @param debug Show the generated "companion" object
  */
-class beanCompanion[ T ] extends StaticAnnotation {
+class beanCompanion[ T ](debug: Boolean = false) extends StaticAnnotation {
   def macroTransform(annottees: Any*) = macro beanCompanionMacro.impl
 }

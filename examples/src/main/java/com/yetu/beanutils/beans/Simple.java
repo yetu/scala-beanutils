@@ -1,5 +1,7 @@
 package com.yetu.beanutils.beans;
 
+import java.util.Objects;
+
 /**
  * Test bean for the @beanCompanion macro. Simple JavaBean with additional accessor methods.
  */
@@ -33,5 +35,20 @@ public class Simple {
 
     public int getLength() { return getFull().length(); }
 
+    @Override
     public String toString() { return getFull(); }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Simple)) return false;
+        Simple simple = (Simple) o;
+        return Objects.equals(getValue(), simple.getValue()) &&
+                Objects.equals(getName(), simple.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getValue());
+    }
 }

@@ -5,6 +5,6 @@ import com.yetu.beanutils.{beans => b}
 /**
  * Test object for the @beanCompanion macro
  */
-@beanCompanion[b.Simple] object Simple {
+@beanCompanion[b.Simple](debug = true) object Simple {
   def foo = "Foo"
 }

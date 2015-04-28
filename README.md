@@ -19,9 +19,12 @@ After that, add the following dependency, as well as the
 macro annotations):
 
 ```scala
-libraryDependencies += "com.yetu" %% "scala-beanutils" % "0.1.1"
+libraryDependencies += "com.yetu" %% "scala-beanutils" % "0.1.2"
 libraryDependencies += compilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
 ```
+
+Note that, currently, we only have published artifacts for Scala 2.10. This is due to the fact that we are still using
+2.10 and that there are differences between how Macro Paradise works in 2.10 and 2.11.
 
 ## Usage
 
@@ -65,6 +68,9 @@ slightly larger example, look in the `examples/` subproject.
 
 ## Caveats and limitations
 
+* Since we are currently working with Scala 2.10 and there are some differences with how Macro Paradise works between
+2.10 and 2.11, we are currently providing binaries only for 2.10
+
 * If the "companion" object extends or implements anything except AnyRef, that will be removed
 
 * The JavaBean and the "companion" cannot be named the same and be in the same package. This is due to a limitation of
@@ -80,3 +86,7 @@ parameters.
 `unapply` method will not match the generated `apply` method. Also, if the Java file does not have debug symbols (i.e.,
 the names of the constructor arguments are not in the .class file), it takes all the accessor methods in the Java file
 and uses them for `unapply`. Have a look at Simple.java and SimpleSpec.scala to see what this means.
+
+* If you need to see the generated code (for example, to know the order of values that go into the extractor), you can
+call the annotation with an optional Boolean parameter. If the parameter is set to `true`, the compiler will print out
+the generated object.
