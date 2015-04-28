@@ -6,7 +6,7 @@ import sbt._
 object BuildSettings {
   val buildSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.yetu",
-    version := "0.1.3",
+    version := "0.1.5-SNAPSHOT",
     scalaVersion := "2.10.5",
     crossScalaVersions := Seq("2.10.5", "2.11.6"),
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-J-DbeanCompanion.debug=true"),
