@@ -6,10 +6,10 @@ import sbt._
 object BuildSettings {
   val buildSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.yetu",
-    version := "0.1.2",
+    version := "0.1.3",
     scalaVersion := "2.10.5",
     crossScalaVersions := Seq("2.10.5", "2.11.6"),
-    scalacOptions ++= Seq("-unchecked", "-deprecation"),
+    scalacOptions ++= Seq("-unchecked", "-deprecation", "-J-DbeanCompanion.debug=true"),
     licenses := ("Apache-2.0", new java.net.URL("http://www.apache.org/licenses/LICENSE-2.0.txt")) :: Nil,
     publishArtifact := false
   )

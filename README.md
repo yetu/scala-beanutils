@@ -82,11 +82,14 @@ parameters.
 
 * If the JavaBean has multiple constructors, `@beanCompanion` will pick the one with the most parameters.
 
-* We assume that the constructor parameters have the same names as the getters. If that is not the case the generated
-`unapply` method will not match the generated `apply` method. Also, if the Java file does not have debug symbols (i.e.,
-the names of the constructor arguments are not in the .class file), it takes all the accessor methods in the Java file
-and uses them for `unapply`. Have a look at Simple.java and SimpleSpec.scala to see what this means.
+* Java removes parameter names from generated `.class` files. Therefore, for generating the `unapply` method 
+`@beanCompanion` uses all the accessor methods in the Java file in order. The main issue with this is if the Java class
+has additional accessors than those defined in the constructor or if the order in which the accessors were declared does
+not match the order of the parameters in the constructor. While this should not normally be an issue in most JavaBeans,
+it is something you have to keep in mind when using the "companion" in pattern matching. Have a look at Simple.java
+and SimpleSpec.scala to see what this means.
 
-* If you need to see the generated code (for example, to know the order of values that go into the extractor), you can
-call the annotation with an optional Boolean parameter. If the parameter is set to `true`, the compiler will print out
-the generated object.
+* If you need to see the generated code (for example, to know the order of values that go into the extractor for pattern
+matching), you can call the annotation with an optional Boolean parameter. If the parameter is set to `true`, the
+compiler will print out the generated object. Another option is to pass in `-J-DbeanCompanion.debug` to `scalac`, which
+will print out all the generated objects. You can add `scalacOptions += "-J-DbeanCompanion.debug"` to your SBT build.

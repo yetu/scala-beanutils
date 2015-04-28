@@ -67,12 +67,28 @@ object beanCompanionMacro {
       }
 
       /**
-       * Create the apply method. It will receive all of the constructor parameters and return an object of the given Type
-       * @param targetType
-       * @param constructorParams
+       * Get the value of the debug parameter passed to the annotation
+       * @param params
        * @return
        */
-      def generateApplyMethod(targetType: Type, constructorParams: List[ Symbol ]): Tree = {
+      def getDebugFlag(params: List[ Tree ]): Boolean = {
+        val debugProperty = System.getProperty("beanCompanion.debug") == null;
+
+        val debugParam: Boolean = params.headOption match {
+          case Some(AssignOrNamedArg(Ident(name), Literal(Constant(true)))) if name.decoded == "debug" ⇒ true
+          case _ ⇒ false
+        }
+
+        debugProperty || debugParam
+      }
+
+      /**
+       * Create the apply method. It will receive all of the constructor parameters and return an object of the given Type
+       * @param targetType
+       * @return
+       */
+      def generateApplyMethod(targetType: Type): Tree = {
+        val constructorParams = getConstructorParams(targetType)
         val applyParams = constructorParams map { p ⇒ q"${p.name.toTermName}: ${p.typeSignature}" }
         val applyBody = constructorParams map { p ⇒ q"${p.name.toTermName}" }
 
@@ -84,29 +100,12 @@ object beanCompanionMacro {
        * the types in the tuple correspond to the parameters given, but only if the corresponding parameter has an
        * Accessor
        * @param targetType
-       * @param constructorParams
        * @return
        */
-      def generateUnapplyMethod(targetType: Type, constructorParams: List[ Symbol ]): Tree = {
-        // We first try to match accessors with the constructor parameters. This is in case the Java file was compiled
-        // with debug symbols (it gives us a mapping that should be equal to the mapping for apply(), assuming that
-        // the constructor parameters were named the same as the accessors
-        val accessors = getAccessors(targetType)
-        val unapplyParamsByConstructor = constructorParams flatMap { p ⇒
-          val parameterName = p.name.decoded.toLowerCase
-          accessors.find {
-            _.name.decoded.toLowerCase contains parameterName
-          }
-        }
-
-        // Since javac usually strips out method names, we might not have them. In that case we fall back on calling all
-        // the accessors, in order
-        val unapplyParams = if (unapplyParamsByConstructor.isEmpty)
-          getAccessors(targetType)
-        else
-          unapplyParamsByConstructor
-
-        val unapplyBody = unapplyParams.map(a ⇒ q"obj.$a()")
+      def generateUnapplyMethod(targetType: Type): Tree = {
+        // Since javac usually strips out method names, we might not have them. For consistency we fall back on calling
+        // all the accessors, in order
+        val unapplyBody = getAccessors(targetType).map(a ⇒ q"obj.$a()")
 
         q"def unapply(obj: $targetType) = Option((..$unapplyBody))"
       }
@@ -130,16 +129,10 @@ object beanCompanionMacro {
 
         val (targetType, params) = getTargetTypeAndParameters
 
-        val debug = params.headOption match {
-          case Some(AssignOrNamedArg(Ident(name), Literal(Constant(true)))) if name.decoded == "debug" ⇒ true
-          case _ ⇒ false
-        }
-        c.macroApplication.symbol.annotations.find(_.tpe <:< typeOf[ beanCompanion[ _ ] ])
+        val debug = getDebugFlag(params)
 
-        val constructorParams: List[ Symbol ] = getConstructorParams(targetType)
-
-        val apply = generateApplyMethod(targetType, constructorParams)
-        val unapply = generateUnapplyMethod(targetType, constructorParams)
+        val apply = generateApplyMethod(targetType)
+        val unapply = generateUnapplyMethod(targetType)
         val otherMethods = nonConstructorMethods(body)
 
         val objectBody = otherMethods :+ apply :+ unapply
@@ -153,6 +146,7 @@ object $objectName {
         c.Expr[ Any ](ret)
       }
 
+    // impl Method body starts here
     annottees.map(_.tree) match {
       case (objectDecl: ModuleDef) :: _ ⇒ modifiedObject(objectDecl)
       case x                            ⇒ c.abort(c.enclosingPosition, s"@beanCompanion can only be applied to an object, not to $x")
