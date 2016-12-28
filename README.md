@@ -11,7 +11,8 @@ The scala-binutils package is published to [Bintray](https://bintray.com/yetu/ma
 it, you need to add the repository to your build:
 
 ```scala
-resolvers += Resolver.url("yetu-bintray-repo", "https://bintray.com/yetu/maven")
+resolvers += Resolver.url("yetu-bintray-repo", url("https://dl.bintray.com/yetu/maven"))(Resolver.ivyStylePatterns)
+resolvers += Resolver.sonatypeRepo("releases")
 ```
 
 After that, add the following dependency, as well as the
@@ -20,7 +21,7 @@ macro annotations):
 
 ```scala
 libraryDependencies += "com.yetu" %% "scala-beanutils" % "0.1.4"
-libraryDependencies += compilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
+addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 ```
 
 Note that, currently, we only have published artifacts for Scala 2.10. This is due to the fact that we are still using
