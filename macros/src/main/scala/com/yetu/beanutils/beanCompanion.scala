@@ -3,11 +3,14 @@ package com.yetu.beanutils
 import scala.annotation.StaticAnnotation
 import scala.language.experimental.macros
 import scala.reflect.macros._
+import scala.reflect.macros.whitebox
+import macrocompat.bundle
 
-object beanCompanionMacro {
+@bundle
+class beanCompanionMacro(val c: whitebox.Context) {
   val accessorRegex = "^((get)|(is)|(has))[A-Z]".r
 
-  def impl(c: Context)(annottees: c.Expr[ Any ]*): c.Expr[ Any ] = {
+  def impl(annottees: c.Expr[ Any ]*): c.Expr[ Any ] = {
     import c.universe._
 
       /**
