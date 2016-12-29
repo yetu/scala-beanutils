@@ -4,11 +4,12 @@ import sbt.Keys._
 import sbt._
 
 object BuildSettings {
+  val scalaVersions = Seq("2.11.8", "2.10.6", "2.12.1")
   val buildSettings = Defaults.defaultSettings ++ Seq(
     organization := "com.yetu",
     version := "0.1.5-SNAPSHOT",
-    scalaVersion := "2.10.5",
-    crossScalaVersions := Seq("2.10.5", "2.11.6"),
+    scalaVersion := scalaVersions.head,
+    crossScalaVersions := scalaVersions,
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-J-DbeanCompanion.debug=true"),
     licenses := ("Apache-2.0", new java.net.URL("http://www.apache.org/licenses/LICENSE-2.0.txt")) :: Nil,
     publishArtifact := false
@@ -18,7 +19,7 @@ object BuildSettings {
 object ScalaBeanUtilsBuild extends Build {
   import BuildSettings._
 
-  val macroParadise = compilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" % "compile" cross CrossVersion.full)
+  val macroParadise = compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" % "compile" cross CrossVersion.full)
 
   lazy val root: Project = Project(
     "root",
@@ -33,12 +34,14 @@ object ScalaBeanUtilsBuild extends Build {
       libraryDependencies := (
         // quasiquotes are alredy added to scala-reflect starting in 2.11, but they have to be explicitly brought in for 2.10
         CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, 10)) ⇒ libraryDependencies.value :+ "org.scalamacros" %% "quasiquotes" % "2.1.0-M5"
+          case Some((2, 10)) ⇒ libraryDependencies.value :+ "org.scalamacros" %% "quasiquotes" % "2.1.0"
           case _             ⇒ libraryDependencies.value
         }
       ),
       libraryDependencies ++= Seq(
         "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+        "org.typelevel" %% "macro-compat" % "1.1.1",
+        "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
         macroParadise
       ),
       resolvers += Resolver.sonatypeRepo("releases"),
@@ -60,7 +63,7 @@ object ScalaBeanUtilsBuild extends Build {
     settings = buildSettings ++ Seq(
       libraryDependencies ++= Seq(
         macroParadise,
-        "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+        "org.scalatest" %% "scalatest" % "3.0.1" % "test"
       ),
       publishArtifact := false
     )

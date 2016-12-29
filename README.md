@@ -7,7 +7,7 @@ a given JavaBean to the Scala object to which it is applied.
 
 ## Installation
 
-The scala-binutils package is published to [Bintray](https://bintray.com/yetu/maven/scala-beanutils). To be able to use
+The scala-beanutils package is published to [Bintray](https://bintray.com/yetu/maven/scala-beanutils). To be able to use
 it, you need to add the repository to your build:
 
 ```scala
@@ -24,8 +24,7 @@ libraryDependencies += "com.yetu" %% "scala-beanutils" % "0.1.4"
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 ```
 
-Note that, currently, we only have published artifacts for Scala 2.10. This is due to the fact that we are still using
-2.10 and that there are differences between how Macro Paradise works in 2.10 and 2.11.
+scala-beanutils package is cross-built against Scala 2.10, 2.11 and 2.12.
 
 ## Usage
 
